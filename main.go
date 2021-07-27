@@ -32,7 +32,7 @@ const (
 )
 
 func DoRoot(c echo.Context) error {
-	return c.String(http.StatusOK, "you in root")
+	return c.String(http.StatusOK, "you in aws root")
 }
 
 func ConfirmId(c echo.Context) error {
