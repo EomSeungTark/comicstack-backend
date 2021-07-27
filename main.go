@@ -242,6 +242,7 @@ func GetReigistedToons(c echo.Context) error {
 }
 
 func main() {
+	// to aws
 	var err error
 
 	dbinfo := fmt.Sprintf("user=%s password=%s dbname=%s sslmode=disable", DB_USER, DB_PASSWORD, DB_NAME)
