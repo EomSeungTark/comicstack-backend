@@ -12,7 +12,7 @@ import (
 
 func ConfirmId(db *sql.DB, UserId string) *COMMON.BasicResult {
 	fmt.Println("ConfirmId")
-	fmt.Println(UserId, " : try check id")
+	// fmt.Println(UserId, " : try check id")
 	sqlString := fmt.Sprintf(`SELECT id FROM users WHERE id='%s'`, UserId)
 	rows, err := db.Query(sqlString)
 	if err != nil {
@@ -39,10 +39,10 @@ func ConfirmId(db *sql.DB, UserId string) *COMMON.BasicResult {
 
 func GetEncryptPassword(db *sql.DB, inputPassword string) string {
 	sKey := COMMON.GetSKey(db)
-	fmt.Println("end get key")
+	// fmt.Println("end get key")
 	EncryptedPassword := CIPHER.Encrypt(inputPassword, sKey)
 
-	fmt.Println("return Encrypted password")
+	// fmt.Println("return Encrypted password")
 	return EncryptedPassword
 }
 
