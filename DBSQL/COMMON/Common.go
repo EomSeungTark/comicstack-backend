@@ -134,7 +134,11 @@ func GetSKey(db *sql.DB) string {
 	fmt.Println("GetSKey")
 	var sKey string
 
-	keyRow, _ := db.Query("SELECT KEY FROM KEYTABLE ORDER BY DATE DESC LIMIT 1")
+	keyRow, err := db.Query("SELECT KEY FROM KEYTABLE ORDER BY DATE DESC LIMIT 1")
+	if err != nil {
+		fmt.Println("db query error")
+		log.Print(err)
+	}
 	for keyRow.Next() {
 		keyRow.Scan(&sKey)
 	}

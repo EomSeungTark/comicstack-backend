@@ -39,6 +39,7 @@ func ConfirmId(db *sql.DB, UserId string) *COMMON.BasicResult {
 
 func GetEncryptPassword(db *sql.DB, inputPassword string) string {
 	sKey := COMMON.GetSKey(db)
+	fmt.Println("end get key")
 	EncryptedPassword := CIPHER.Encrypt(inputPassword, sKey)
 
 	fmt.Println("return Encrypted password")
