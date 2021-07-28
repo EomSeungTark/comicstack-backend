@@ -131,6 +131,7 @@ type CheckImagePath struct {
 }
 
 func GetSKey(db *sql.DB) string {
+	fmt.Println("GetSKey")
 	var sKey string
 
 	keyRow, _ := db.Query("SELECT KEY FROM KEYTABLE ORDER BY DATE DESC LIMIT 1")

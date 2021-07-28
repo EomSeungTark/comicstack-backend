@@ -41,6 +41,7 @@ func GetEncryptPassword(db *sql.DB, inputPassword string) string {
 	sKey := COMMON.GetSKey(db)
 	EncryptedPassword := CIPHER.Encrypt(inputPassword, sKey)
 
+	fmt.Println("return Encrypted password")
 	return EncryptedPassword
 }
 

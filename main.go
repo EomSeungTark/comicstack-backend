@@ -28,7 +28,7 @@ var db *sql.DB
 const (
 	DB_USER     = "postgres"
 	DB_PASSWORD = "800326"
-	DB_NAME     = "comicstack"
+	DB_NAME     = "postgres"
 )
 
 func DoRoot(c echo.Context) error {
@@ -267,5 +267,5 @@ func main() {
 	e.POST("/api/toon/getepisodes", GetEpisodes)
 	e.POST("/api/toon/dotoon", DoToon)
 
-	e.Start(":80")
+	e.Start(":443")
 }
