@@ -250,6 +250,7 @@ func main() {
 	if err != nil {
 		log.Print(err)
 	}
+	fmt.Println(db)
 
 	e := echo.New()
 	e.Use(middleware.CORS())
