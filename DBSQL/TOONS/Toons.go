@@ -45,7 +45,8 @@ func GetToons(db *sql.DB) *COMMON.GetToonsResult {
 
 	for rows.Next() {
 		valueStruct := new(COMMON.ToonsInfo)
-		rows.Scan(&valueStruct.USER_ID, &valueStruct.DAY, &valueStruct.TITLE, &valueStruct.THUMBNAIL_PATH, &valueStruct.CONTEXT)
+		rows.Scan(&valueStruct.USER_ID, &valueStruct.DAY, &valueStruct.TITLE, &valueStruct.THUMBNAIL_PATH, &valueStruct.CONTEXT, &valueStruct.TOON_SID)
+		valueStruct.THUMBNAIL_PATH = norm.NFC.String(valueStruct.THUMBNAIL_PATH)
 		getToonsResult.Toons = append(getToonsResult.Toons, *valueStruct)
 	}
 
