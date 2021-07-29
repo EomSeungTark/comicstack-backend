@@ -37,7 +37,7 @@ func GetToons(db *sql.DB) *COMMON.GetToonsResult {
 	fmt.Println("GetToons")
 	getToonsResult := new(COMMON.GetToonsResult)
 
-	sqlString := fmt.Sprintf(`SELECT USER_ID, DAY, TITLE, THUMBNAIL_PATH, CONTEXT FROM TOONS WHERE ENDING = false AND PASS = true`)
+	sqlString := fmt.Sprintf(`SELECT USER_ID, DAY, TITLE, THUMBNAIL_PATH, CONTEXT, SID FROM TOONS WHERE ENDING = false AND PASS = true`)
 	rows, err := db.Query(sqlString)
 	if err != nil {
 		log.Print(err)
@@ -45,7 +45,8 @@ func GetToons(db *sql.DB) *COMMON.GetToonsResult {
 
 	for rows.Next() {
 		valueStruct := new(COMMON.ToonsInfo)
-		rows.Scan(&valueStruct.USER_ID, &valueStruct.DAY, &valueStruct.TITLE, &valueStruct.THUMBNAIL_PATH, &valueStruct.CONTEXT)
+		rows.Scan(&valueStruct.USER_ID, &valueStruct.DAY, &valueStruct.TITLE, &valueStruct.THUMBNAIL_PATH, &valueStruct.CONTEXT, &valueStruct.TOON_SID)
+		valueStruct.THUMBNAIL_PATH = norm.NFC.String(valueStruct.THUMBNAIL_PATH)
 		getToonsResult.Toons = append(getToonsResult.Toons, *valueStruct)
 	}
 
