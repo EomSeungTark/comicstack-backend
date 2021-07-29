@@ -37,7 +37,7 @@ func GetToons(db *sql.DB) *COMMON.GetToonsResult {
 	fmt.Println("GetToons")
 	getToonsResult := new(COMMON.GetToonsResult)
 
-	sqlString := fmt.Sprintf(`SELECT USER_ID, DAY, TITLE, VIEWS, THUMBNAIL_PATH, CONTEXT FROM TOONS WHERE ENDING = false AND PASS = true`)
+	sqlString := fmt.Sprintf(`SELECT USER_ID, DAY, TITLE, THUMBNAIL_PATH, CONTEXT FROM TOONS WHERE ENDING = false AND PASS = true`)
 	rows, err := db.Query(sqlString)
 	if err != nil {
 		log.Print(err)

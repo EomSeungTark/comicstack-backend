@@ -1,16 +1,18 @@
 package main
 
 import (
+	"bytes"
 	"database/sql"
 	"encoding/json"
 	"fmt"
 	"io"
 	"log"
 	"net/http"
-	"os"
-	"path/filepath"
 	"strconv"
 
+	"github.com/aws/aws-sdk-go/aws"
+	"github.com/aws/aws-sdk-go/aws/session"
+	"github.com/aws/aws-sdk-go/service/s3/s3manager"
 	"github.com/labstack/echo"
 	"github.com/labstack/echo/middleware"
 	_ "github.com/lib/pq"
@@ -23,6 +25,12 @@ import (
 )
 
 var db *sql.DB
+
+// go to env_var
+const (
+	S3_REGION = "ap-northeast-2"
+	S3_BUCKET = "comicstack-bucket"
+)
 
 // go to env_var
 const (
@@ -91,7 +99,10 @@ func TryToonRegist(c echo.Context) error {
 
 	// html파일에 file을 받는 input 태그에 name 값이 키 값과 같아야 한다.
 	files := form.File["thumbnail_file"]
-	fmt.Println(files)
+
+	sess, _ := session.NewSession(&aws.Config{
+		Region: aws.String(S3_REGION),
+	})
 
 	for _, file := range files {
 		src, err := file.Open()
@@ -100,16 +111,30 @@ func TryToonRegist(c echo.Context) error {
 		}
 		defer src.Close()
 
-		mkfilepath := filepath.Join(`C:\savedata`, file.Filename)
-		// fmt.Println("path is : ", mkfilepath)
-		dst, err := os.Create(mkfilepath)
-		if err != nil {
-			return err
-		}
-		defer dst.Close()
+		mkfilepath := ""
 
-		if _, err = io.Copy(dst, src); err != nil {
-			return err
+		fileContent, _ := file.Open()
+		defer fileContent.Close()
+
+		buf := bytes.NewBuffer(nil)
+		if _, err := io.Copy(buf, fileContent); err != nil {
+			return nil
+		}
+
+		uploader := s3manager.NewUploader(sess)
+		_, err = uploader.Upload(&s3manager.UploadInput{
+			Bucket: aws.String(S3_BUCKET),
+			Key:    aws.String(file.Filename),
+			Body:   buf,
+		})
+
+		if err != nil {
+			fmt.Println("file upload error")
+			log.Println(err)
+		} else {
+			fmt.Println(aws.String(S3_BUCKET), aws.String(file.Filename))
+			mkfilepath = "https://" + S3_BUCKET + "." + "s3." + S3_REGION + ".amazonaws.com/" + file.Filename
+			fmt.Println(mkfilepath)
 		}
 
 		thumbnailPath = COMMON.InsertImagePath(db, mkfilepath, toonRegist.USER_ID, "thumbnail")
@@ -132,6 +157,10 @@ func TryToonUpload(c echo.Context) error {
 	thumbnailFiles := form.File["thumbnail_files"]
 	thumbnailPath := ""
 
+	sess, _ := session.NewSession(&aws.Config{
+		Region: aws.String(S3_REGION),
+	})
+
 	toonUpload := new(COMMON.ToonUpload)
 	if err := c.Bind(toonUpload); err != nil {
 		return echo.NewHTTPError(http.StatusBadRequest, err.Error())
@@ -139,49 +168,49 @@ func TryToonUpload(c echo.Context) error {
 	defer c.Request().Body.Close()
 
 	for _, file := range toonFiles {
-		src, err := file.Open()
-		if err != nil {
-			return err
-		}
-		defer src.Close()
+		mkfilepath := ""
 
-		mkfilepath := filepath.Join(`C:\savedata`, file.Filename)
-		// fmt.Println("path is : ", mkfilepath)
-		dst, err := os.Create(mkfilepath)
-		if err != nil {
-			return err
-		}
-		defer dst.Close()
+		fileContent, _ := file.Open()
+		defer fileContent.Close()
 
-		if _, err = io.Copy(dst, src); err != nil {
-			return err
+		buf := bytes.NewBuffer(nil)
+		if _, err := io.Copy(buf, fileContent); err != nil {
+			return nil
 		}
+
+		uploader := s3manager.NewUploader(sess)
+		_, err = uploader.Upload(&s3manager.UploadInput{
+			Bucket: aws.String(S3_BUCKET),
+			Key:    aws.String(file.Filename),
+			Body:   buf,
+		})
 
 		episodeValue := COMMON.GetEpisodeValue(db, toonUpload.TOON_SID, toonUpload.EPISODE_NAME)
 		toonSidEpi := strconv.Itoa(toonUpload.TOON_SID) + "_" + strconv.Itoa(episodeValue)
+		mkfilepath = "https://" + S3_BUCKET + "." + "s3." + S3_REGION + ".amazonaws.com/" + file.Filename
 
 		COMMON.InsertImagePath(db, mkfilepath, toonUpload.USER_ID, toonSidEpi)
 	}
 
 	for _, file := range thumbnailFiles {
-		src, err := file.Open()
-		if err != nil {
-			return err
-		}
-		defer src.Close()
+		mkfilepath := ""
 
-		mkfilepath := filepath.Join(`C:\savedata`, file.Filename)
-		// fmt.Println("path is : ", mkfilepath)
-		dst, err := os.Create(mkfilepath)
-		if err != nil {
-			return err
-		}
-		defer dst.Close()
+		fileContent, _ := file.Open()
+		defer fileContent.Close()
 
-		if _, err = io.Copy(dst, src); err != nil {
-			return err
+		buf := bytes.NewBuffer(nil)
+		if _, err := io.Copy(buf, fileContent); err != nil {
+			return nil
 		}
 
+		uploader := s3manager.NewUploader(sess)
+		_, err = uploader.Upload(&s3manager.UploadInput{
+			Bucket: aws.String(S3_BUCKET),
+			Key:    aws.String(file.Filename),
+			Body:   buf,
+		})
+
+		mkfilepath = "https://" + S3_BUCKET + "." + "s3." + S3_REGION + ".amazonaws.com/" + file.Filename
 		thumbnailPath = COMMON.InsertImagePath(db, mkfilepath, toonUpload.USER_ID, "thumbnail")
 	}
 
@@ -262,7 +291,7 @@ func main() {
 	e.POST("/api/toon/getmytoon", GetReigistedToons)
 	e.POST("/api/toon/upload", TryToonUpload)
 	//-----------------------------------------------------------------------------
-	e.POST("/api/toon/gettoons", GetToons)
+	e.GET("/api/toon/gettoons", GetToons)
 	e.POST("/api/toon/getepisodes", GetEpisodes)
 	e.POST("/api/toon/dotoon", DoToon)
 
