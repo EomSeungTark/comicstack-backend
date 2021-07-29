@@ -36,7 +36,7 @@ const (
 const (
 	DB_USER     = "postgres"
 	DB_PASSWORD = "800326"
-	DB_NAME     = "comicstack"
+	DB_NAME     = "postgres"
 )
 
 func DoRoot(c echo.Context) error {
