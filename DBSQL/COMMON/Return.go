@@ -6,7 +6,7 @@ type BasicResult struct {
 
 type LoginResult struct {
 	STATUS       bool   `json:"status"`
-	ID           string `json:"id"`
+	USER_ID      string `json:"user_id"`
 	ADDRESS      string `json:"address"`
 	PHONE_NUMBER string `json:"phone_number"`
 	EMAIL        string `json:"email"`

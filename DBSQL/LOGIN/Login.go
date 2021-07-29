@@ -78,14 +78,14 @@ func TryLogin(db *sql.DB, InputID string, InputPASSWORD string) *COMMON.LoginRes
 		loginResult.SMS_AGREE = userInfoStruct.SMS_AGREE
 		loginResult.EMAIL_AGREE = userInfoStruct.EMAIL_AGREE
 		loginResult.NAME = userInfoStruct.NAME
-		loginResult.ID = InputID
+		loginResult.USER_ID = InputID
 		return loginResult
 	} else {
 		// fmt.Println(InputID + ":" + "login fail")
 		CreateLoginRecode(db, InputID, false)
 		loginResult := new(COMMON.LoginResult)
 		loginResult.STATUS = false
-		loginResult.ID = InputID
+		loginResult.USER_ID = InputID
 		return loginResult
 	}
 }
