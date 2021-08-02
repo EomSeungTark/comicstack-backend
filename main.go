@@ -187,6 +187,7 @@ func TryToonUpload(c echo.Context) error {
 			Key:    aws.String(file.Filename),
 			Body:   buf,
 		})
+		fmt.Println(err)
 
 		episodeValue := COMMON.GetEpisodeValue(db, toonUpload.TOON_SID, toonUpload.EPISODE_NAME)
 		toonSidEpi := strconv.Itoa(toonUpload.TOON_SID) + "_" + strconv.Itoa(episodeValue)
