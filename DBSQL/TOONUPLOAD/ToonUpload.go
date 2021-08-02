@@ -49,7 +49,7 @@ func TryToonUpload(db *sql.DB, toonUpload *COMMON.ToonUpload, toonSidEpi string,
 			rows.Scan(&resentEpisode)
 		}
 	}
-
+	fmt.Println("resentEpisode : ", resentEpisode)
 	// num, err := strconv.Atoi(resentEpisode)
 	episodeNum := resentEpisode
 	episodeNum = episodeNum + 1
