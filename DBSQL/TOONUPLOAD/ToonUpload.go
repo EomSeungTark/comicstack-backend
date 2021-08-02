@@ -39,6 +39,8 @@ func TryToonUpload(db *sql.DB, toonUpload *COMMON.ToonUpload, toonSidEpi string,
 
 	var resentEpisode int
 
+	fmt.Println("TOON_SID : ", toonUpload.TOON_SID)
+
 	rows, _ := db.Query("SELECT EPISODE FROM TOONS_CONTEXT WHERE TOON_SID='%d' ORDER BY CREATE_AT DESC LIMIT 1", toonUpload.TOON_SID)
 	if rows == nil {
 		resentEpisode = 0
