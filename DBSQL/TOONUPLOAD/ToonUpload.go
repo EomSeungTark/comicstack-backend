@@ -51,6 +51,7 @@ func TryToonUpload(db *sql.DB, toonUpload *COMMON.ToonUpload, toonSidEpi string,
 	// num, err := strconv.Atoi(resentEpisode)
 	episodeNum := resentEpisode
 	episodeNum = episodeNum + 1
+	fmt.Println("episodeNum : ", episodeNum)
 
 	userInterestSQL := fmt.Sprintf("INSERT INTO TOONS_CONTEXT (EPISODE, THUMBNAIL_PATH, TOON_SID, CREATE_AT, EPISODE_NAME, VIEWS) values ('%d', '%s', '%d', '%s', '%s', '%d')",
 		episodeNum, thumbnailPath, toonUpload.TOON_SID, toDbTime, toonUpload.EPISODE_NAME, 0)
