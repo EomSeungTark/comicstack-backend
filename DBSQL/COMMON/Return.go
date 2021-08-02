@@ -29,8 +29,6 @@ type UserComment struct {
 
 type GetSelectedEpisodeResult struct {
 	THUMBNAIL_PATH string        `json:"thumbnail_path"`
-	TOON_SID       int           `json:"toon_sid"`
-	EPISODE_NAME   string        `json:"episode_name"`
 	TOON_CONTEXT   []string      `json:"toon_context"`
 	UserComments   []UserComment `json:"usercomments"`
 }

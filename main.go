@@ -147,6 +147,7 @@ func TryToonRegist(c echo.Context) error {
 }
 
 func TryToonUpload(c echo.Context) error {
+	fmt.Println("TryToonUpload")
 	form, err := c.MultipartForm()
 	if err != nil {
 		return err
@@ -167,6 +168,8 @@ func TryToonUpload(c echo.Context) error {
 	}
 	defer c.Request().Body.Close()
 
+	fmt.Println(toonFiles)
+	fmt.Println(thumbnailFiles)
 	for _, file := range toonFiles {
 		mkfilepath := ""
 
@@ -226,11 +229,14 @@ func GetToons(c echo.Context) error {
 	toonsReuslt := TOONS.GetToons(db)
 	e, _ := json.Marshal(toonsReuslt)
 
+	fmt.Println(toonsReuslt)
 	return c.String(http.StatusOK, string(e))
 }
 
 func GetEpisodes(c echo.Context) error {
+	fmt.Println("GetEpisodes")
 	selectedToon := new(COMMON.SelectedToon)
+	fmt.Println(c)
 	if err := c.Bind(selectedToon); err != nil {
 		return echo.NewHTTPError(http.StatusBadRequest, err.Error())
 	}
@@ -239,18 +245,22 @@ func GetEpisodes(c echo.Context) error {
 	// TOONS.
 	getEpisodes := TOONS.GetEpisodes(db, selectedToon)
 	e, _ := json.Marshal(getEpisodes)
+	fmt.Println(getEpisodes)
 
 	return c.String(http.StatusOK, string(e))
 }
 
 func DoToon(c echo.Context) error {
+	fmt.Println("DoToon")
 	selectedEpisode := new(COMMON.DoToon)
 	if err := c.Bind(selectedEpisode); err != nil {
 		return echo.NewHTTPError(http.StatusBadRequest, err.Error())
 	}
 	defer c.Request().Body.Close()
+	fmt.Println("selectedEpisode: ", selectedEpisode)
 
 	episodeValue := COMMON.GetEpisodeValue(db, selectedEpisode.TOON_SID, selectedEpisode.EPISODE_NAME)
+	fmt.Println("episode value: ", episodeValue)
 	selectedEpisodeResult := TOONS.GetSelectedEpisode(db, selectedEpisode, episodeValue)
 	e, _ := json.Marshal(selectedEpisodeResult)
 	return c.String(http.StatusOK, string(e))

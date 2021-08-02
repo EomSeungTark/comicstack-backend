@@ -37,7 +37,7 @@ func GetToons(db *sql.DB) *COMMON.GetToonsResult {
 	fmt.Println("GetToons")
 	getToonsResult := new(COMMON.GetToonsResult)
 
-	sqlString := fmt.Sprintf(`SELECT USER_ID, DAY, TITLE, THUMBNAIL_PATH, CONTEXT FROM TOONS WHERE ENDING = false AND PASS = true`)
+	sqlString := fmt.Sprintf(`SELECT USER_ID, DAY, TITLE, THUMBNAIL_PATH, CONTEXT, SID FROM TOONS WHERE ENDING=false AND PASS=true`)
 	rows, err := db.Query(sqlString)
 	if err != nil {
 		log.Print(err)
@@ -50,6 +50,7 @@ func GetToons(db *sql.DB) *COMMON.GetToonsResult {
 		getToonsResult.Toons = append(getToonsResult.Toons, *valueStruct)
 	}
 
+	getToonsResult.STATUS = true
 	return getToonsResult
 }
 
@@ -58,7 +59,8 @@ func GetEpisodes(db *sql.DB, SelectToon *COMMON.SelectedToon) *COMMON.EpisodesIn
 	fmt.Println("GetEpisodes")
 	episodesInfo := new(COMMON.EpisodesInfo)
 
-	sqlString := fmt.Sprintf(`SELECT EPISODE_NAME, THUMBNAIL_PATH, VIEWS, TOON_SID FROM TOONS_CONTEXT WHERE TOON_SID='%d'`, SelectToon.TOON_SID)
+	fmt.Println(SelectToon)
+	sqlString := fmt.Sprintf(`SELECT EPISODE, EPISODE_NAME, THUMBNAIL_PATH, VIEWS, TOON_SID, CREATE_AT FROM TOONS_CONTEXT WHERE TOON_SID='%d'`, SelectToon.TOON_SID)
 	rows, err := db.Query(sqlString)
 	if err != nil {
 		log.Print(err)
@@ -66,7 +68,8 @@ func GetEpisodes(db *sql.DB, SelectToon *COMMON.SelectedToon) *COMMON.EpisodesIn
 
 	for rows.Next() {
 		episodeInfo := new(COMMON.EpisodeInfo)
-		rows.Scan(&episodeInfo.EPISODE_NAME, &episodeInfo.THUMBNAIL_PATH, &episodeInfo.VIEWS, &episodeInfo.TOON_SID)
+		rows.Scan(&episodeInfo.EPISODE, &episodeInfo.EPISODE_NAME, &episodeInfo.THUMBNAIL_PATH,
+			&episodeInfo.VIEWS, &episodeInfo.TOON_SID, &episodeInfo.CREATE_AT)
 
 		// getImagePathSQL := fmt.Sprintf(`SELECT PATH FROM IMAGEPATH WHERE TOON_SID_EPISODE='%s'`, toonSidEpi)
 		// pathRows, err := db.Query(getImagePathSQL)
@@ -86,17 +89,17 @@ func GetEpisodes(db *sql.DB, SelectToon *COMMON.SelectedToon) *COMMON.EpisodesIn
 }
 
 func GetSelectedEpisode(db *sql.DB, SelectEpisode *COMMON.DoToon, EpisodeValue int) *COMMON.GetSelectedEpisodeResult {
-	fmt.Println("GetEpisodes")
+	fmt.Println("GetSelectedEpisode")
 	selectedEpisodesInfo := new(COMMON.GetSelectedEpisodeResult)
 
-	sqlString := fmt.Sprintf(`SELECT THUMBNAIL_PATH, TOON_SID, EPISODE_NAME FROM TOONS_CONTEXT WHERE TOON_SID=%d AND EPISODE_NAME='%s' AND EPISODE=%d`,
+	sqlString := fmt.Sprintf(`SELECT THUMBNAIL_PATH FROM TOONS_CONTEXT WHERE TOON_SID='%d' AND EPISODE_NAME='%s' AND EPISODE='%d'`,
 		SelectEpisode.TOON_SID, SelectEpisode.EPISODE_NAME, EpisodeValue)
 	rows, err := db.Query(sqlString)
 	if err != nil {
 		log.Print(err)
 	}
 	for rows.Next() {
-		rows.Scan(&selectedEpisodesInfo.THUMBNAIL_PATH, &selectedEpisodesInfo.TOON_SID, &selectedEpisodesInfo.EPISODE_NAME)
+		rows.Scan(&selectedEpisodesInfo.THUMBNAIL_PATH)
 	}
 
 	getImagePathSQL := fmt.Sprintf(`SELECT PATH FROM IMAGEPATH WHERE TOON_SID_EPISODE='%s'`,
@@ -107,7 +110,7 @@ func GetSelectedEpisode(db *sql.DB, SelectEpisode *COMMON.DoToon, EpisodeValue i
 	}
 	for pathRows.Next() {
 		var tempPath string
-		rows.Scan(&tempPath)
+		pathRows.Scan(&tempPath)
 		selectedEpisodesInfo.TOON_CONTEXT = append(selectedEpisodesInfo.TOON_CONTEXT, tempPath)
 	}
 	sort.Strings(selectedEpisodesInfo.TOON_CONTEXT)

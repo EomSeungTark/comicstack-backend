@@ -40,16 +40,20 @@ func TryToonUpload(db *sql.DB, toonUpload *COMMON.ToonUpload, toonSidEpi string,
 	var resentEpisode int
 
 	rows, _ := db.Query("SELECT EPISODE FROM TOONS_CONTEXT WHERE TOON_SID='%d' ORDER BY DATE DESC LIMIT 1", toonUpload.TOON_SID)
-	for rows.Next() {
-		rows.Scan(&resentEpisode)
+	if rows == nil {
+		resentEpisode = 0
+	} else {
+		for rows.Next() {
+			rows.Scan(&resentEpisode)
+		}
 	}
 
 	// num, err := strconv.Atoi(resentEpisode)
 	episodeNum := resentEpisode
 	episodeNum = episodeNum + 1
 
-	userInterestSQL := fmt.Sprintf("INSERT INTO TOONS_CONTEXT (EPISODE, CONTEXT_PATH, THUMBNAIL_PATH, TOON_SID, CREATE_AT, EPISODE_NAME, VIEWS) values ('%d', '%s', '%s', '%d', '%s', '%s', '%d')",
-		episodeNum, toonSidEpi, thumbnailPath, toonUpload.TOON_SID, toDbTime, toonUpload.EPISODE_NAME, 0)
+	userInterestSQL := fmt.Sprintf("INSERT INTO TOONS_CONTEXT (EPISODE, THUMBNAIL_PATH, TOON_SID, CREATE_AT, EPISODE_NAME, VIEWS) values ('%d', '%s', '%d', '%s', '%s', '%d')",
+		episodeNum, thumbnailPath, toonUpload.TOON_SID, toDbTime, toonUpload.EPISODE_NAME, 0)
 	row, err := db.Query(userInterestSQL)
 	if err != nil {
 		log.Print(err)

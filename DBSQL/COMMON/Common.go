@@ -103,16 +103,16 @@ type ToonsInfo struct {
 }
 
 type SelectedToon struct {
-	USER_ID  string `json:"user_id"`
-	TOON_SID int    `json:"toon_sid"`
-	TITLE    string `json:"title"`
+	TOON_SID int `json:"toon_sid"`
 }
 
 type EpisodeInfo struct {
+	EPISODE        int    `json:"episode"`
 	EPISODE_NAME   string `json:"episode_name"`
 	THUMBNAIL_PATH string `json:"thumbnail_path"`
 	VIEWS          int    `json:"views"`
 	TOON_SID       int    `json:"toon_sid"`
+	CREATE_AT      string `json:"create_at"`
 }
 
 type EpisodesInfo struct {
@@ -202,11 +202,19 @@ func InsertImagePath(db *sql.DB, filepath string, userId string, toonSidEpisode 
 }
 
 func GetEpisodeValue(db *sql.DB, toonSid int, episode_name string) int {
+	fmt.Println("GetEpisodeValue")
 	var resentEpisode int
 
-	rows, _ := db.Query("SELECT EPISODE FROM TOONS_CONTEXT WHERE TOON_SID='%d' AND EPISODE_NAME='%s' ORDER BY DATE DESC LIMIT 1", toonSid, episode_name)
-	for rows.Next() {
-		rows.Scan(&resentEpisode)
+	fmt.Println(toonSid, episode_name)
+	getEpisodeSQL := fmt.Sprintf("SELECT EPISODE FROM TOONS_CONTEXT WHERE TOON_SID='%d' AND EPISODE_NAME='%s'", toonSid, episode_name)
+	rows, _ := db.Query(getEpisodeSQL)
+	fmt.Println(rows)
+	if rows == nil {
+		return 0
+	} else {
+		for rows.Next() {
+			rows.Scan(&resentEpisode)
+		}
 	}
 
 	return resentEpisode
