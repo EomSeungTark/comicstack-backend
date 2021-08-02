@@ -140,6 +140,7 @@ func TryToonRegist(c echo.Context) error {
 		thumbnailPath = COMMON.InsertImagePath(db, mkfilepath, toonRegist.USER_ID, "thumbnail")
 	}
 
+	fmt.Println("thumbnailPath : asdfasfdasdf", thumbnailPath)
 	toonRegistResult := ToonUpload.TryToonRegist(db, toonRegist, thumbnailPath)
 	e, _ := json.Marshal(toonRegistResult)
 
