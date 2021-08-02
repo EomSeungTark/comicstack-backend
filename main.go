@@ -28,8 +28,8 @@ var db *sql.DB
 
 // go to env_var
 const (
-	S3_REGION = "ap-northeast-2"
-	S3_BUCKET = "comicstack-bucket"
+	S3_REGION = "us-east-2"
+	S3_BUCKET = "comicstack-bucket2"
 )
 
 // go to env_var
