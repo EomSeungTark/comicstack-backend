@@ -208,14 +208,16 @@ func GetEpisodeValue(db *sql.DB, toonSid int, episode_name string) int {
 	fmt.Println(toonSid, episode_name)
 	getEpisodeSQL := fmt.Sprintf("SELECT EPISODE FROM TOONS_CONTEXT WHERE TOON_SID='%d' AND EPISODE_NAME='%s'", toonSid, episode_name)
 	rows, _ := db.Query(getEpisodeSQL)
-	fmt.Println(rows)
+	fmt.Printf("%v\n", rows)
 	if rows == nil {
+		fmt.Println("0이당ㅇㅇㅇㅇ ")
 		return 0
 	} else {
+		fmt.Println("아니당  ")
 		for rows.Next() {
 			rows.Scan(&resentEpisode)
 		}
 	}
-
+	fmt.Println("아니당: ", resentEpisode)
 	return resentEpisode
 }
