@@ -222,3 +222,25 @@ func GetEpisodeValue(db *sql.DB, toonSid int, episode_name string) int {
 	fmt.Println("아니당: ", resentEpisode)
 	return resentEpisode
 }
+
+func GetNextEpisodeValue(db *sql.DB, toonSid int) int {
+	fmt.Println("GetEpisodeValue")
+	var resentEpisode int
+
+	fmt.Println(toonSid)
+	getEpisodeSQL := fmt.Sprintf("SELECT EPISODE FROM TOONS_CONTEXT WHERE TOON_SID='%d' ORDER BY CREATE_AT DESC LIMIT 1", toonSid)
+	rows, _ := db.Query(getEpisodeSQL)
+	fmt.Printf("%+v\n", rows)
+	if rows == nil {
+		fmt.Println("0이당ㅇㅇㅇㅇ ")
+		return 0
+	} else {
+		fmt.Println("아니당  ")
+		for rows.Next() {
+			fmt.Println("tlqkf")
+			rows.Scan(&resentEpisode)
+		}
+	}
+	fmt.Println("아니당: ", resentEpisode)
+	return resentEpisode + 1
+}

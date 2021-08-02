@@ -189,7 +189,7 @@ func TryToonUpload(c echo.Context) error {
 		})
 		fmt.Println(err)
 
-		episodeValue := COMMON.GetEpisodeValue(db, toonUpload.TOON_SID, toonUpload.EPISODE_NAME)
+		episodeValue := COMMON.GetNextEpisodeValue(db, toonUpload.TOON_SID)
 		fmt.Println("episodeValue sadfasdf:", episodeValue)
 		fmt.Println(strconv.Itoa(episodeValue))
 		toonSidEpi := strconv.Itoa(toonUpload.TOON_SID) + "_" + strconv.Itoa(episodeValue)
