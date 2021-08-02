@@ -137,6 +137,7 @@ func TryToonRegist(c echo.Context) error {
 			fmt.Println(mkfilepath)
 		}
 
+		mkfilepath = "https://" + S3_BUCKET + "." + "s3." + S3_REGION + ".amazonaws.com/" + file.Filename
 		thumbnailPath = COMMON.InsertImagePath(db, mkfilepath, toonRegist.USER_ID, "thumbnail")
 	}
 
