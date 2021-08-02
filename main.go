@@ -190,6 +190,7 @@ func TryToonUpload(c echo.Context) error {
 		fmt.Println(err)
 
 		episodeValue := COMMON.GetEpisodeValue(db, toonUpload.TOON_SID, toonUpload.EPISODE_NAME)
+		fmt.Println("episodeValue sadfasdf:", episodeValue)
 		fmt.Println(strconv.Itoa(episodeValue))
 		toonSidEpi := strconv.Itoa(toonUpload.TOON_SID) + "_" + strconv.Itoa(episodeValue)
 		mkfilepath = "https://" + S3_BUCKET + "." + "s3." + S3_REGION + ".amazonaws.com/" + file.Filename
