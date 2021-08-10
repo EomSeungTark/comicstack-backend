@@ -29,8 +29,8 @@ var db *sql.DB
 
 // go to env_var
 const (
-	S3_REGION = "us-east-2"
-	S3_BUCKET = "comicstack-bucket2"
+	S3_REGION = "ap-northeast-2"
+	S3_BUCKET = "comicstack-bucket"
 )
 
 // go to env_var
@@ -312,5 +312,5 @@ func main() {
 	e.POST("/api/toon/getepisodes", GetEpisodes)
 	e.POST("/api/toon/dotoon", DoToon)
 
-	e.Start(":4000")
+	e.Start(":80")
 }
