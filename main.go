@@ -8,11 +8,13 @@ import (
 	"io"
 	"log"
 	"net/http"
+	"os"
 	"strconv"
 
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/s3/s3manager"
+	"github.com/go-redis/redis/v7"
 	"github.com/labstack/echo"
 	"github.com/labstack/echo/middleware"
 	_ "github.com/lib/pq"
@@ -22,9 +24,11 @@ import (
 	SIGNIN "github.com/eom/comicstack_prototype/DBSQL/SIGNIN"
 	TOONS "github.com/eom/comicstack_prototype/DBSQL/TOONS"
 	ToonUpload "github.com/eom/comicstack_prototype/DBSQL/TOONUPLOAD"
+	JWT "github.com/eom/comicstack_prototype/JWT"
 )
 
 var db *sql.DB
+var client *redis.Client
 
 // go to env_var
 const (
@@ -38,6 +42,20 @@ const (
 	DB_PASSWORD = "800326"
 	DB_NAME     = "postgres"
 )
+
+func init() {
+	dsn := os.Getenv("REDIS_DSN")
+	if len(dsn) == 0 {
+		dsn = "localhost:6379"
+	}
+	client = redis.NewClient(&redis.Options{
+		Addr: dsn, //redis port
+	})
+	_, err := client.Ping().Result()
+	if err != nil {
+		log.Print(err)
+	}
+}
 
 func DoRoot(c echo.Context) error {
 	return c.String(http.StatusOK, "you in root")
@@ -64,7 +82,7 @@ func TryLogin(c echo.Context) error {
 	defer c.Request().Body.Close()
 	// fmt.Println(loginInfo)
 
-	loginResult := LOGIN.TryLogin(db, loginInfo.USER_ID, loginInfo.PASSWORD)
+	loginResult := LOGIN.TryLogin(db, loginInfo.USER_ID, loginInfo.PASSWORD, client)
 	e, _ := json.Marshal(loginResult)
 
 	return c.String(http.StatusOK, string(e))
@@ -84,6 +102,9 @@ func TrySignIn(c echo.Context) error {
 }
 
 func TryToonRegist(c echo.Context) error {
+	// jwt check----------------------------------------
+	TokenCheck(c)
+	//--------------------------------------------------
 
 	toonRegist := new(COMMON.ToonRegist)
 	if err := c.Bind(toonRegist); err != nil {
@@ -285,6 +306,31 @@ func GetReigistedToons(c echo.Context) error {
 	return c.String(http.StatusOK, string(e))
 }
 
+func UserLogout(c echo.Context) error {
+	au, err := JWT.ExtractTokenMetadata(c)
+	if err != nil {
+		return c.JSON(http.StatusUnauthorized, "unauthorized")
+	}
+	deleted, delErr := JWT.DeleteAuth(au.AccessUuid, client)
+	if delErr != nil || deleted == 0 {
+		return c.JSON(http.StatusUnauthorized, "unauthorized")
+	}
+
+	return c.String(http.StatusOK, "Logout Success")
+}
+
+func ReToken(c echo.Context) error {
+	return JWT.Refresh(c, client)
+}
+
+func TokenCheck(c echo.Context) {
+	err := JWT.TokenValid(c)
+	if err != nil {
+		fmt.Println("already expired, why?")
+		c.JSON(http.StatusUnauthorized, err.Error())
+	}
+}
+
 func main() {
 	var err error
 
@@ -301,6 +347,7 @@ func main() {
 	e.POST("/api/login", TryLogin)
 	e.POST("/api/signin", TrySignIn)
 	e.POST("/api/idcheck", ConfirmId)
+	e.POST("/api/logout", UserLogout)
 	//-----------------------------------------------------------------------------
 	e.POST("/api/toon/regist", TryToonRegist)
 	e.POST("/api/toon/getmytoon", GetReigistedToons)
@@ -309,6 +356,8 @@ func main() {
 	e.GET("/api/toon/gettoons", GetToons)
 	e.POST("/api/toon/getepisodes", GetEpisodes)
 	e.POST("/api/toon/dotoon", DoToon)
+
+	e.GET("/api/refresh", ReToken)
 
 	e.Start(":4000")
 }

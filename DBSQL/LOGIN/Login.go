@@ -9,6 +9,8 @@ import (
 
 	CIPHER "github.com/eom/comicstack_prototype/CIPHER"
 	COMMON "github.com/eom/comicstack_prototype/DBSQL/COMMON"
+	JWT "github.com/eom/comicstack_prototype/JWT"
+	"github.com/go-redis/redis/v7"
 )
 
 func GetUserInfo(db *sql.DB, UserId string) COMMON.UserInfo {
@@ -54,7 +56,7 @@ func CreateLoginRecode(db *sql.DB, InputID string, TF bool) {
 	defer row.Close()
 }
 
-func TryLogin(db *sql.DB, InputID string, InputPASSWORD string) *COMMON.LoginResult {
+func TryLogin(db *sql.DB, InputID string, InputPASSWORD string, client *redis.Client) *COMMON.LoginResult {
 	sKey := COMMON.GetSKey(db)
 	userInfoStruct := GetUserInfo(db, InputID)
 	// fmt.Println(userInfoStruct)
@@ -79,6 +81,11 @@ func TryLogin(db *sql.DB, InputID string, InputPASSWORD string) *COMMON.LoginRes
 		loginResult.EMAIL_AGREE = userInfoStruct.EMAIL_AGREE
 		loginResult.NAME = userInfoStruct.NAME
 		loginResult.USER_ID = InputID
+		loginResult.JWT, _ = JWT.CreateToken(InputID)
+		saveErr := JWT.CreateAuth(InputID, loginResult.JWT, client)
+		if saveErr != nil {
+			log.Print(saveErr.Error())
+		}
 		return loginResult
 	} else {
 		// fmt.Println(InputID + ":" + "login fail")
