@@ -11,6 +11,7 @@ import (
 	"strconv"
 
 	"github.com/aws/aws-sdk-go/aws"
+	"github.com/aws/aws-sdk-go/aws/credentials"
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/s3/s3manager"
 	"github.com/labstack/echo"
@@ -161,7 +162,8 @@ func TryToonUpload(c echo.Context) error {
 	thumbnailPath := ""
 
 	sess, _ := session.NewSession(&aws.Config{
-		Region: aws.String(S3_REGION),
+		Region:      aws.String(S3_REGION),
+		Credentials: credentials.NewEnvCredentials(),
 	})
 
 	toonUpload := new(COMMON.ToonUpload)
