@@ -103,6 +103,7 @@ func TryToonRegist(c echo.Context) error {
 
 	sess, _ := session.NewSession(&aws.Config{
 		Region: aws.String(S3_REGION),
+		// Credentials: credentials.NewStaticCredentials("AKIA3GPC6ZSQPJSNVJKV", "728/rLAE8iLkVMNTyjppgX7rxo0T420zjQj/rehy", ""),
 	})
 
 	for _, file := range files {
@@ -311,6 +312,7 @@ func main() {
 	e.GET("/api/toon/gettoons", GetToons)
 	e.POST("/api/toon/getepisodes", GetEpisodes)
 	e.POST("/api/toon/dotoon", DoToon)
+	//-----------------------------------------------------------------------------
 
 	e.Start(":80")
 }
