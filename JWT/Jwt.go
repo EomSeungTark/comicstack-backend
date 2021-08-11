@@ -31,23 +31,23 @@ type AccessDetails struct {
 func CreateToken(userid string) (*TokenDetails, error) {
 	td := &TokenDetails{}
 	// td.AtExpires = time.Now().Add(time.Minute * 15).Unix()
-	td.AtExpires = time.Now().Add(time.Minute * 3).Unix()
+	td.AtExpires = time.Now().Add(time.Minute * 1).Unix()
 	td.AccessUuid = uuid.NewV4().String()
 
 	// td.RtExpires = time.Now().Add(time.Hour * 24 * 7).Unix()
-	td.RtExpires = time.Now().Add(time.Minute * 5).Unix()
+	td.RtExpires = time.Now().Add(time.Minute * 10).Unix()
 	td.RefreshUuid = uuid.NewV4().String()
 
 	var err error
 
-	idToNumber, err := strconv.ParseUint(userid, 10, 64)
+	// idToNumber, err := strconv.ParseUint(userid, 10, 64)
 
 	//Creating Access Token
 	os.Setenv("ACCESS_SECRET_TOKEN", "zn80qjr03m2f6")
 	atClaims := jwt.MapClaims{}
 	atClaims["authorized"] = true
 	atClaims["access_uuid"] = td.AccessUuid
-	atClaims["user_id"] = idToNumber
+	atClaims["user_id"] = userid
 	atClaims["exp"] = td.AtExpires
 	at := jwt.NewWithClaims(jwt.SigningMethodHS256, atClaims)
 	td.AccessToken, err = at.SignedString([]byte(os.Getenv("ACCESS_SECRET_TOKEN")))
@@ -71,16 +71,16 @@ func CreateToken(userid string) (*TokenDetails, error) {
 }
 
 func CreateAuth(userid string, td *TokenDetails, client *redis.Client) error {
-	idToNumber, _ := strconv.ParseUint(userid, 10, 64)
+	// idToNumber, _ := strconv.ParseUint(userid, 10, 64)
 	at := time.Unix(td.AtExpires, 0) //converting Unix to UTC
 	rt := time.Unix(td.RtExpires, 0)
 	now := time.Now()
 
-	errAccess := client.Set(td.AccessUuid, strconv.Itoa(int(idToNumber)), at.Sub(now)).Err()
+	errAccess := client.Set(td.AccessUuid, userid, at.Sub(now)).Err()
 	if errAccess != nil {
 		return errAccess
 	}
-	errRefresh := client.Set(td.RefreshUuid, strconv.Itoa(int(idToNumber)), rt.Sub(now)).Err()
+	errRefresh := client.Set(td.RefreshUuid, userid, rt.Sub(now)).Err()
 	if errRefresh != nil {
 		return errRefresh
 	}
@@ -91,12 +91,15 @@ func ExtractToken(c echo.Context) string {
 	bearToken := c.Request().Header.Get("Authorization")
 	fmt.Println("ExtractToken : ", bearToken)
 	//normally Authorization the_token_xxx
+	//if strings.Contains(bearToken, "\"") {
+	bearToken = strings.ReplaceAll(bearToken, "\"", "")
+	//}
 	strArr := strings.Split(bearToken, " ")
 	if len(strArr) == 2 {
 		return strArr[1]
 	}
 
-	return ""
+	return strArr[0]
 }
 
 func VerifyToken(c echo.Context) (*jwt.Token, error) {
@@ -111,9 +114,9 @@ func VerifyToken(c echo.Context) (*jwt.Token, error) {
 		return []byte(os.Getenv("ACCESS_SECRET_TOKEN")), nil
 	})
 	fmt.Println("VerifyToken2 : ", token, err)
-	// if err != nil {
-	// 	return nil, err
-	// }
+	if err != nil {
+		return nil, err
+	}
 	return token, nil
 }
 
@@ -128,13 +131,11 @@ func ExtractTokenMetadata(c echo.Context) (*AccessDetails, error) {
 		if !ok {
 			return nil, err
 		}
-		userId, err := strconv.ParseUint(fmt.Sprintf("%.f", claims["user_id"]), 10, 64)
-		if err != nil {
-			return nil, err
-		}
+		userId := claims["user_id"].(string)
+
 		return &AccessDetails{
 			AccessUuid: accessUuid,
-			UserId:     strconv.FormatUint(userId, 10),
+			UserId:     userId,
 		}, nil
 	}
 	return nil, err
@@ -179,6 +180,7 @@ func Refresh(c echo.Context, client *redis.Client) error {
 	// }
 	// refreshToken := mapToken["refresh_token"]
 	refreshToken := c.Request().Header.Get("Refresh_Token")
+	fmt.Println("refreshToken1 : ", refreshToken)
 
 	//verify the token
 	os.Setenv("REFRESH_SECRET_TOKEN", "mckmsdnfsdmfdsjf") //this should be in an env file
@@ -189,6 +191,7 @@ func Refresh(c echo.Context, client *redis.Client) error {
 		}
 		return []byte(os.Getenv("REFRESH_SECRET_TOKEN")), nil
 	})
+	fmt.Println("refreshToken2 : ", token, err)
 	//if there is an error, the token must have expired
 	if err != nil {
 		return c.JSON(http.StatusUnauthorized, "Refresh token expired")
@@ -204,22 +207,23 @@ func Refresh(c echo.Context, client *redis.Client) error {
 		if !ok {
 			return c.JSON(http.StatusUnprocessableEntity, err)
 		}
-		userId, err := strconv.ParseUint(fmt.Sprintf("%.f", claims["user_id"]), 10, 64)
-		if err != nil {
-			return c.JSON(http.StatusUnprocessableEntity, "Error occurred")
-		}
+		fmt.Println(claims["user_id"])
+		userId := claims["user_id"].(string)
+		// if err != nil {
+		// 	return c.JSON(http.StatusUnprocessableEntity, "Error occurred")
+		// }
 		//Delete the previous Refresh Token
 		deleted, delErr := DeleteAuth(refreshUuid, client)
 		if delErr != nil || deleted == 0 {
 			return c.JSON(http.StatusUnauthorized, "unauthorized")
 		}
 		//Create new pairs of refresh and access tokens
-		ts, createErr := CreateToken(strconv.Itoa(int(userId)))
+		ts, createErr := CreateToken(userId)
 		if createErr != nil {
 			return c.JSON(http.StatusForbidden, createErr.Error())
 		}
 		//save the tokens metadata to redis
-		saveErr := CreateAuth(strconv.Itoa(int(userId)), ts, client)
+		saveErr := CreateAuth(userId, ts, client)
 		if saveErr != nil {
 			return c.JSON(http.StatusForbidden, saveErr.Error())
 		}

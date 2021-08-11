@@ -331,6 +331,24 @@ func TokenCheck(c echo.Context) {
 	}
 }
 
+func AccessTokenCheck(c echo.Context) error {
+	err := JWT.TokenValid(c)
+	if err != nil {
+		fmt.Println("already expired, why?")
+		return c.JSON(http.StatusUnauthorized, err.Error())
+	}
+
+	return c.String(http.StatusOK, "OK")
+}
+
+// @title Example API
+// @version 0.0.2
+// @description This is a Example api server
+// @contact.name Request permission of Example API
+// @contact.url http://www.yonghochoi.com
+// @contact.email yongho1037@gmail.com
+// @host localhost
+// @BasePath /api/v1
 func main() {
 	var err error
 
@@ -358,6 +376,9 @@ func main() {
 	e.POST("/api/toon/dotoon", DoToon)
 
 	e.GET("/api/refresh", ReToken)
+	e.GET("/api/jwt/check", AccessTokenCheck)
+
+	// e.GET("/swagger/*", echoSwagger.WrapHandler)
 
 	e.Start(":4000")
 }
