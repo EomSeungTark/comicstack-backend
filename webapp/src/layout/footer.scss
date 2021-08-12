@@ -1,0 +1,61 @@
+.FooterLayout {
+  width: 100%;
+  height: 320px;
+  background-color: #303740;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.FooterLayoutStart {
+  margin-top: 20px;
+  // background-color: darkblue;
+  width: 70%;
+  height: 50%;
+  display: flex;
+  color: whitesmoke;
+  justify-content: space-around;
+}
+
+.FooterLayoutEnd {
+  // background-color: darkcyan;
+  width: 70%;
+  height: 50%;
+  color: whitesmoke;
+}
+
+.Service,
+.Terms,
+.Ask,
+.CustomerCenter,
+.Logo {
+  h3 {
+    font-family: NotoSans-Bold;
+    margin: 10px 5px 15px 15px;
+  }
+  h4 {
+    font-family: NotoSans-Regular;
+    font-size: 14px;
+    margin: 5px 15px;
+  }
+  p {
+    font-family: NotoSans-Regular;
+    margin: 5px 15px;
+    font-size: 12px;
+  }
+  img {
+    margin-top: 25px;
+  }
+}
+
+.CompanyName {
+  font-family: NotoSans-Bold;
+  margin: 30px 5px 15px 15px;
+  font-size: 12px;
+}
+
+.CompanyDesc {
+  font-family: NotoSans-Regular;
+  margin: 5px 15px;
+  font-size: 12px;
+}

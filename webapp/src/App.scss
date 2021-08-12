@@ -1,0 +1,78 @@
+.App {
+  // text-align: center;
+  height: 100%;
+
+  font-family: NotoSans-Regular;
+
+  .body-layout {
+    width: 100%;
+    height: 100%;
+    min-width: 37.5rem;
+    display: inline-block;
+    // background-color: antiquewhite;
+    margin: 0 auto;
+  }
+  
+  .input-margin-bottom {
+    margin-bottom: 10px;
+  }
+  // 포커싱 되었을 때 파란선 나타나게 되는거 없애기
+  button:focus {
+    box-shadow: none !important;
+  }
+}
+
+@font-face {
+  font-family: NotoSans-Black;
+  src: url("font/NotoSansKR-Black.otf");
+}
+
+@font-face {
+  font-family: NotoSans-Bold;
+  src: url("font/NotoSansKR-Bold.otf");
+}
+
+@font-face {
+  font-family: NotoSans-Medium;
+  src: url("font/NotoSansKR-Medium.otf");
+}
+
+@font-face {
+  font-family: NotoSans-Regular;
+  src: url("font/NotoSansKR-Regular.otf");
+}
+
+.App-logo {
+  height: 40vmin;
+  pointer-events: none;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .App-logo {
+    animation: App-logo-spin infinite 20s linear;
+  }
+}
+
+.App-header {
+  background-color: #282c34;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  font-size: calc(10px + 2vmin);
+  color: white;
+}
+
+.App-link {
+  color: #61dafb;
+}
+
+@keyframes App-logo-spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}

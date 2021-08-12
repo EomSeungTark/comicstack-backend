@@ -5,6 +5,8 @@ import (
 	"database/sql"
 	"encoding/json"
 	"fmt"
+	_ "github.com/eom/comicstack_prototype/statik"
+	"github.com/rakyll/statik/fs"
 	"io"
 	"log"
 	"net/http"
@@ -14,19 +16,17 @@ import (
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/s3/s3manager"
-	_ "github.com/eom/comicstack_prototype/docs"
-	"github.com/go-redis/redis/v7"
-	"github.com/labstack/echo/v4"
-	"github.com/labstack/echo/v4/middleware"
-	_ "github.com/lib/pq"
-	echoSwagger "github.com/swaggo/echo-swagger"
-
 	COMMON "github.com/eom/comicstack_prototype/DBSQL/COMMON"
 	LOGIN "github.com/eom/comicstack_prototype/DBSQL/LOGIN"
 	SIGNIN "github.com/eom/comicstack_prototype/DBSQL/SIGNIN"
 	TOONS "github.com/eom/comicstack_prototype/DBSQL/TOONS"
 	ToonUpload "github.com/eom/comicstack_prototype/DBSQL/TOONUPLOAD"
 	JWT "github.com/eom/comicstack_prototype/JWT"
+	_ "github.com/eom/comicstack_prototype/docs"
+	"github.com/go-redis/redis/v7"
+	"github.com/labstack/echo/v4"
+	"github.com/labstack/echo/v4/middleware"
+	echoSwagger "github.com/swaggo/echo-swagger"
 )
 
 var db *sql.DB
@@ -392,8 +392,14 @@ func main() {
 
 	e := echo.New()
 	e.Use(middleware.CORS())
-
-	e.GET("/", DoRoot)
+	e.Use(middleware.Logger())
+	statikFS, err := fs.New()
+	if err != nil {
+		e.Logger.Fatal(err)
+	}
+	h := http.FileServer(statikFS)
+	e.Static("/static", "webapp/build/static")
+	e.GET("/", echo.WrapHandler(http.StripPrefix("/", h)))
 	e.GET("/swagger/*", echoSwagger.WrapHandler)
 
 	e.POST("/api/login", TryLogin)
@@ -412,5 +418,8 @@ func main() {
 	e.GET("/api/refresh", ReToken)
 	e.GET("/api/jwt/check", AccessTokenCheck)
 
-	e.Start(":4000")
+	//e.Start(":4000")
+
+	e.Logger.Fatal(e.Start(":4000"))
+
 }
