@@ -1,0 +1,15 @@
+version: '3.8'
+services:
+  db:
+#    platform: linux/x86_64
+    container_name: comicstack-postgres
+    image: postgres:13.0
+    volumes:
+      - ./database-init/init.sql:/docker-entrypoint-initdb.d/init.sql
+    restart: always
+    environment:
+      POSTGRES_DB: postgres
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: 800326
+    ports:
+      - 5432:5432

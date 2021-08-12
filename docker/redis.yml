@@ -1,0 +1,8 @@
+version: '3.8'
+services:
+  redis:
+    container_name: comicstack-redis
+    image: redis:6.2.5-alpine
+    restart: always
+    ports:
+      - 6379:6379
