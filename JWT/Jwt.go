@@ -10,7 +10,7 @@ import (
 
 	"github.com/dgrijalva/jwt-go"
 	"github.com/go-redis/redis/v7"
-	"github.com/labstack/echo"
+	"github.com/labstack/echo/v4"
 	"github.com/twinj/uuid"
 )
 

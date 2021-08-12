@@ -14,10 +14,12 @@ import (
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/s3/s3manager"
+	_ "github.com/eom/comicstack_prototype/docs"
 	"github.com/go-redis/redis/v7"
-	"github.com/labstack/echo"
-	"github.com/labstack/echo/middleware"
+	"github.com/labstack/echo/v4"
+	"github.com/labstack/echo/v4/middleware"
 	_ "github.com/lib/pq"
+	echoSwagger "github.com/swaggo/echo-swagger"
 
 	COMMON "github.com/eom/comicstack_prototype/DBSQL/COMMON"
 	LOGIN "github.com/eom/comicstack_prototype/DBSQL/LOGIN"
@@ -331,6 +333,13 @@ func TokenCheck(c echo.Context) {
 	}
 }
 
+// AccessTokenCheck godoc
+// @Tags jwt
+// @Accept */*
+// @Produce json
+// @Security jwt-access
+// @response 200 {object} string "comment""
+// @Router /jwt/check [get]
 func AccessTokenCheck(c echo.Context) error {
 	err := JWT.TokenValid(c)
 	if err != nil {
@@ -341,14 +350,24 @@ func AccessTokenCheck(c echo.Context) error {
 	return c.String(http.StatusOK, "OK")
 }
 
-// @title Example API
-// @version 0.0.2
-// @description This is a Example api server
-// @contact.name Request permission of Example API
-// @contact.url http://www.yonghochoi.com
-// @contact.email yongho1037@gmail.com
-// @host localhost
-// @BasePath /api/v1
+// @title Swagger Example API
+// @version 1.0
+// @description This is a sample server Petstore server.
+// @termsOfService http://swagger.io/terms/
+
+// @contact.name API Support
+// @contact.url http://www.swagger.io/support
+// @contact.email support@swagger.io
+
+// @license.name Apache 2.0
+// @license.url http://www.apache.org/licenses/LICENSE-2.0.html
+
+// @host petstore.swagger.io
+// @BasePath /v2
+
+// @securityDefinitions.apikey jwt-access
+// @in header
+// @name Authorization
 func main() {
 	var err error
 
@@ -362,6 +381,8 @@ func main() {
 	e.Use(middleware.CORS())
 
 	e.GET("/", DoRoot)
+	e.GET("/swagger/*", echoSwagger.WrapHandler)
+
 	e.POST("/api/login", TryLogin)
 	e.POST("/api/signin", TrySignIn)
 	e.POST("/api/idcheck", ConfirmId)
@@ -377,8 +398,6 @@ func main() {
 
 	e.GET("/api/refresh", ReToken)
 	e.GET("/api/jwt/check", AccessTokenCheck)
-
-	// e.GET("/swagger/*", echoSwagger.WrapHandler)
 
 	e.Start(":4000")
 }
