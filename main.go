@@ -76,6 +76,13 @@ func ConfirmId(c echo.Context) error {
 	return c.String(http.StatusOK, string(e))
 }
 
+// AccessTokenCheck godoc
+// @Tags user-login
+// @Accept json
+// @Produce json
+// @Param Body body COMMON.LoginInfo true "User Info Body"
+// @Success 200 {object} COMMON.LoginResult
+// @Router /api/login [post]
 func TryLogin(c echo.Context) error {
 	loginInfo := new(COMMON.LoginInfo)
 	if err := c.Bind(loginInfo); err != nil {
@@ -321,6 +328,11 @@ func UserLogout(c echo.Context) error {
 	return c.String(http.StatusOK, "Logout Success")
 }
 
+// @Tags jwt-refresh
+// @Produce json
+// @Security jwt-refresh
+// @response 200 {object} string "comment"
+// @Router /api/refresh [get]
 func ReToken(c echo.Context) error {
 	return JWT.Refresh(c, client)
 }
@@ -333,13 +345,11 @@ func TokenCheck(c echo.Context) {
 	}
 }
 
-// AccessTokenCheck godoc
-// @Tags jwt
-// @Accept */*
+// @Tags jwt-check
 // @Produce json
 // @Security jwt-access
-// @response 200 {object} string "comment""
-// @Router /jwt/check [get]
+// @response 200 {object} string "comment"
+// @Router /api/jwt/check [get]
 func AccessTokenCheck(c echo.Context) error {
 	err := JWT.TokenValid(c)
 	if err != nil {
@@ -362,12 +372,15 @@ func AccessTokenCheck(c echo.Context) error {
 // @license.name Apache 2.0
 // @license.url http://www.apache.org/licenses/LICENSE-2.0.html
 
-// @host petstore.swagger.io
-// @BasePath /v2
+// @host localhost:4000
+// @BasePath /
 
 // @securityDefinitions.apikey jwt-access
 // @in header
 // @name Authorization
+// @securityDefinitions.apikey jwt-refresh
+// @in header
+// @name Refresh_Token
 func main() {
 	var err error
 

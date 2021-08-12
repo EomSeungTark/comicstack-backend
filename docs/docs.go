@@ -33,21 +33,73 @@ var doc = `{
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
     "paths": {
-        "/jwt/check": {
+        "/api/jwt/check": {
             "get": {
                 "security": [
                     {
                         "jwt-access": []
                     }
                 ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "jwt-check"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "comment",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/login": {
+            "post": {
                 "consumes": [
-                    "*/*"
+                    "application/json"
                 ],
                 "produces": [
                     "application/json"
                 ],
                 "tags": [
-                    "jwt"
+                    "user-login"
+                ],
+                "parameters": [
+                    {
+                        "description": "User Info Body",
+                        "name": "Body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/common.LoginInfo"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/common.LoginResult"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/refresh": {
+            "get": {
+                "security": [
+                    {
+                        "jwt-refresh": []
+                    }
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "jwt-refresh"
                 ],
                 "responses": {
                     "200": {
@@ -60,10 +112,83 @@ var doc = `{
             }
         }
     },
+    "definitions": {
+        "common.LoginInfo": {
+            "type": "object",
+            "properties": {
+                "password": {
+                    "type": "string"
+                },
+                "user_id": {
+                    "type": "string"
+                }
+            }
+        },
+        "common.LoginResult": {
+            "type": "object",
+            "properties": {
+                "address": {
+                    "type": "string"
+                },
+                "email": {
+                    "type": "string"
+                },
+                "email_agree": {
+                    "type": "boolean"
+                },
+                "jwt": {
+                    "$ref": "#/definitions/jwt.TokenDetails"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "phone_number": {
+                    "type": "string"
+                },
+                "sms_agree": {
+                    "type": "boolean"
+                },
+                "status": {
+                    "type": "boolean"
+                },
+                "user_id": {
+                    "type": "string"
+                }
+            }
+        },
+        "jwt.TokenDetails": {
+            "type": "object",
+            "properties": {
+                "accesstoken": {
+                    "type": "string"
+                },
+                "accessuuid": {
+                    "type": "string"
+                },
+                "atexpires": {
+                    "type": "integer"
+                },
+                "refreshtoken": {
+                    "type": "string"
+                },
+                "refreshuuid": {
+                    "type": "string"
+                },
+                "rtexpires": {
+                    "type": "integer"
+                }
+            }
+        }
+    },
     "securityDefinitions": {
         "jwt-access": {
             "type": "apiKey",
             "name": "Authorization",
+            "in": "header"
+        },
+        "jwt-refresh": {
+            "type": "apiKey",
+            "name": "Refresh_Token",
             "in": "header"
         }
     }
@@ -81,8 +206,8 @@ type swaggerInfo struct {
 // SwaggerInfo holds exported Swagger Info so clients can modify it
 var SwaggerInfo = swaggerInfo{
 	Version:     "1.0",
-	Host:        "petstore.swagger.io",
-	BasePath:    "/v2",
+	Host:        "localhost:4000",
+	BasePath:    "/",
 	Schemes:     []string{},
 	Title:       "Swagger Example API",
 	Description: "This is a sample server Petstore server.",

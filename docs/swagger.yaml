@@ -1,5 +1,49 @@
-basePath: /v2
-host: petstore.swagger.io
+basePath: /
+definitions:
+  common.LoginInfo:
+    properties:
+      password:
+        type: string
+      user_id:
+        type: string
+    type: object
+  common.LoginResult:
+    properties:
+      address:
+        type: string
+      email:
+        type: string
+      email_agree:
+        type: boolean
+      jwt:
+        $ref: '#/definitions/jwt.TokenDetails'
+      name:
+        type: string
+      phone_number:
+        type: string
+      sms_agree:
+        type: boolean
+      status:
+        type: boolean
+      user_id:
+        type: string
+    type: object
+  jwt.TokenDetails:
+    properties:
+      accesstoken:
+        type: string
+      accessuuid:
+        type: string
+      atexpires:
+        type: integer
+      refreshtoken:
+        type: string
+      refreshuuid:
+        type: string
+      rtexpires:
+        type: integer
+    type: object
+host: localhost:4000
 info:
   contact:
     email: support@swagger.io
@@ -13,10 +57,8 @@ info:
   title: Swagger Example API
   version: "1.0"
 paths:
-  /jwt/check:
+  /api/jwt/check:
     get:
-      consumes:
-      - '*/*'
       produces:
       - application/json
       responses:
@@ -27,10 +69,47 @@ paths:
       security:
       - jwt-access: []
       tags:
-      - jwt
+      - jwt-check
+  /api/login:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: User Info Body
+        in: body
+        name: Body
+        required: true
+        schema:
+          $ref: '#/definitions/common.LoginInfo'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/common.LoginResult'
+      tags:
+      - user-login
+  /api/refresh:
+    get:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: comment
+          schema:
+            type: string
+      security:
+      - jwt-refresh: []
+      tags:
+      - jwt-refresh
 securityDefinitions:
   jwt-access:
     in: header
     name: Authorization
+    type: apiKey
+  jwt-refresh:
+    in: header
+    name: Refresh_Token
     type: apiKey
 swagger: "2.0"

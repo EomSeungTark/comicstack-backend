@@ -15,24 +15,76 @@
         },
         "version": "1.0"
     },
-    "host": "petstore.swagger.io",
-    "basePath": "/v2",
+    "host": "localhost:4000",
+    "basePath": "/",
     "paths": {
-        "/jwt/check": {
+        "/api/jwt/check": {
             "get": {
                 "security": [
                     {
                         "jwt-access": []
                     }
                 ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "jwt-check"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "comment",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/login": {
+            "post": {
                 "consumes": [
-                    "*/*"
+                    "application/json"
                 ],
                 "produces": [
                     "application/json"
                 ],
                 "tags": [
-                    "jwt"
+                    "user-login"
+                ],
+                "parameters": [
+                    {
+                        "description": "User Info Body",
+                        "name": "Body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/common.LoginInfo"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/common.LoginResult"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/refresh": {
+            "get": {
+                "security": [
+                    {
+                        "jwt-refresh": []
+                    }
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "jwt-refresh"
                 ],
                 "responses": {
                     "200": {
@@ -45,10 +97,83 @@
             }
         }
     },
+    "definitions": {
+        "common.LoginInfo": {
+            "type": "object",
+            "properties": {
+                "password": {
+                    "type": "string"
+                },
+                "user_id": {
+                    "type": "string"
+                }
+            }
+        },
+        "common.LoginResult": {
+            "type": "object",
+            "properties": {
+                "address": {
+                    "type": "string"
+                },
+                "email": {
+                    "type": "string"
+                },
+                "email_agree": {
+                    "type": "boolean"
+                },
+                "jwt": {
+                    "$ref": "#/definitions/jwt.TokenDetails"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "phone_number": {
+                    "type": "string"
+                },
+                "sms_agree": {
+                    "type": "boolean"
+                },
+                "status": {
+                    "type": "boolean"
+                },
+                "user_id": {
+                    "type": "string"
+                }
+            }
+        },
+        "jwt.TokenDetails": {
+            "type": "object",
+            "properties": {
+                "accesstoken": {
+                    "type": "string"
+                },
+                "accessuuid": {
+                    "type": "string"
+                },
+                "atexpires": {
+                    "type": "integer"
+                },
+                "refreshtoken": {
+                    "type": "string"
+                },
+                "refreshuuid": {
+                    "type": "string"
+                },
+                "rtexpires": {
+                    "type": "integer"
+                }
+            }
+        }
+    },
     "securityDefinitions": {
         "jwt-access": {
             "type": "apiKey",
             "name": "Authorization",
+            "in": "header"
+        },
+        "jwt-refresh": {
+            "type": "apiKey",
+            "name": "Refresh_Token",
             "in": "header"
         }
     }
