@@ -117,3 +117,31 @@ func GetSelectedEpisode(db *sql.DB, SelectEpisode *COMMON.DoToon, EpisodeValue i
 
 	return selectedEpisodesInfo
 }
+
+func SetToonEnding(db *sql.DB, updateToon *COMMON.UpdateToon) *COMMON.BasicResult {
+	UpdateToonEndingSQL := fmt.Sprintf("UPDATE TOONS SET ENDING='%t' WHERE SID='%d' AND TITLE='%s'", updateToon.ENDING, updateToon.SID, updateToon.TITLE)
+	row, err := db.Query(UpdateToonEndingSQL)
+	if err != nil {
+		fmt.Println("toon ending update error")
+		log.Print(err)
+	}
+	defer row.Close()
+
+	returnStruct := new(COMMON.BasicResult)
+	returnStruct.STATUS = true
+	return returnStruct
+}
+
+func DeleteToonEnding(db *sql.DB, deleteToon *COMMON.DeleteToon) *COMMON.BasicResult {
+	DeleteToonEndingSQL := fmt.Sprintf("DELETE FROM TOONS WHERE SID='%d' AND TITLE='%s'", deleteToon.SID, deleteToon.TITLE)
+	row, err := db.Query(DeleteToonEndingSQL)
+	if err != nil {
+		fmt.Println("toon ending delete error")
+		log.Print(err)
+	}
+	defer row.Close()
+
+	returnStruct := new(COMMON.BasicResult)
+	returnStruct.STATUS = true
+	return returnStruct
+}

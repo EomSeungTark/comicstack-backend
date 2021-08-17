@@ -456,6 +456,8 @@ func main() {
 	e.GET("/api/refresh", ReToken)
 	e.GET("/api/jwt/check", AccessTokenCheck)
 
+	e.POST("/api/toon/setending", SetToonEnding)
+	e.POST("/api/toon/deletetoon", DeleteToon)
 	//e.Start(":4000")
 
 	e.Logger.Fatal(e.Start(":4000"))

@@ -130,6 +130,19 @@ type CheckImagePath struct {
 	PATH    string `json:"path"`
 }
 
+type UpdateToon struct {
+	SID     int    `json:"sid"`
+	TITLE   string `json:"title"`
+	USER_ID string `json:"user_id"`
+	ENDING  bool   `json:"ending"`
+}
+
+type DeleteToon struct {
+	SID     int    `json:"sid"`
+	TITLE   string `json:"title"`
+	USER_ID string `json:"user_id"`
+}
+
 func GetSKey(db *sql.DB) string {
 	var sKey string
 
