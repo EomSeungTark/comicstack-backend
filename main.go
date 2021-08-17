@@ -362,6 +362,42 @@ func AccessTokenCheck(c echo.Context) error {
 	return c.String(http.StatusOK, "OK")
 }
 
+// @Tags set-toon-ending
+// @Accept json
+// @Produce json
+// @Param Body body COMMON.UpdateToon true "set toon ending"
+// @Success 200 {object} COMMON.BasicResult
+// @Router /api/toon/setending [post]
+func SetToonEnding(c echo.Context) error {
+	updateToon := new(COMMON.UpdateToon)
+	if err := c.Bind(updateToon); err != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, err.Error())
+	}
+	defer c.Request().Body.Close()
+
+	returnStruct := TOONS.SetToonEnding(db, updateToon)
+
+	return c.JSON(http.StatusOK, returnStruct)
+}
+
+// @Tags delete-toon
+// @Accept json
+// @Produce json
+// @Param Body body COMMON.DeleteToon true "deletetoon"
+// @Success 200 {object} COMMON.BasicResult
+// @Router /api/toon/deletetoon [post]
+func DeleteToon(c echo.Context) error {
+	deleteToon := new(COMMON.DeleteToon)
+	if err := c.Bind(deleteToon); err != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, err.Error())
+	}
+	defer c.Request().Body.Close()
+
+	returnStruct := TOONS.DeleteToonEnding(db, deleteToon)
+
+	return c.JSON(http.StatusOK, returnStruct)
+}
+
 // @title Swagger Example API
 // @version 1.0
 // @description This is a sample server Petstore server.
