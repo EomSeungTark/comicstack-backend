@@ -5,13 +5,15 @@ import (
 	"database/sql"
 	"encoding/json"
 	"fmt"
-	_ "github.com/eom/comicstack_prototype/statik"
-	"github.com/rakyll/statik/fs"
 	"io"
 	"log"
 	"net/http"
 	"os"
 	"strconv"
+
+	_ "github.com/eom/comicstack_prototype/statik"
+	_ "github.com/lib/pq"
+	"github.com/rakyll/statik/fs"
 
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/session"
