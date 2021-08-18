@@ -1,5 +1,19 @@
 basePath: /
 definitions:
+  common.BasicResult:
+    properties:
+      status:
+        type: boolean
+    type: object
+  common.DeleteToon:
+    properties:
+      sid:
+        type: integer
+      title:
+        type: string
+      user_id:
+        type: string
+    type: object
   common.LoginInfo:
     properties:
       password:
@@ -25,6 +39,17 @@ definitions:
         type: boolean
       status:
         type: boolean
+      user_id:
+        type: string
+    type: object
+  common.UpdateToon:
+    properties:
+      ending:
+        type: boolean
+      sid:
+        type: integer
+      title:
+        type: string
       user_id:
         type: string
     type: object
@@ -103,6 +128,46 @@ paths:
       - jwt-refresh: []
       tags:
       - jwt-refresh
+  /api/toon/deletetoon:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: deletetoon
+        in: body
+        name: Body
+        required: true
+        schema:
+          $ref: '#/definitions/common.DeleteToon'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/common.BasicResult'
+      tags:
+      - delete-toon
+  /api/toon/setending:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: set toon ending
+        in: body
+        name: Body
+        required: true
+        schema:
+          $ref: '#/definitions/common.UpdateToon'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/common.BasicResult'
+      tags:
+      - set-toon-ending
 securityDefinitions:
   jwt-access:
     in: header

@@ -95,9 +95,95 @@
                     }
                 }
             }
+        },
+        "/api/toon/deletetoon": {
+            "post": {
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "delete-toon"
+                ],
+                "parameters": [
+                    {
+                        "description": "deletetoon",
+                        "name": "Body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/common.DeleteToon"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/common.BasicResult"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/toon/setending": {
+            "post": {
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "set-toon-ending"
+                ],
+                "parameters": [
+                    {
+                        "description": "set toon ending",
+                        "name": "Body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/common.UpdateToon"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/common.BasicResult"
+                        }
+                    }
+                }
+            }
         }
     },
     "definitions": {
+        "common.BasicResult": {
+            "type": "object",
+            "properties": {
+                "status": {
+                    "type": "boolean"
+                }
+            }
+        },
+        "common.DeleteToon": {
+            "type": "object",
+            "properties": {
+                "sid": {
+                    "type": "integer"
+                },
+                "title": {
+                    "type": "string"
+                },
+                "user_id": {
+                    "type": "string"
+                }
+            }
+        },
         "common.LoginInfo": {
             "type": "object",
             "properties": {
@@ -135,6 +221,23 @@
                 },
                 "status": {
                     "type": "boolean"
+                },
+                "user_id": {
+                    "type": "string"
+                }
+            }
+        },
+        "common.UpdateToon": {
+            "type": "object",
+            "properties": {
+                "ending": {
+                    "type": "boolean"
+                },
+                "sid": {
+                    "type": "integer"
+                },
+                "title": {
+                    "type": "string"
                 },
                 "user_id": {
                     "type": "string"

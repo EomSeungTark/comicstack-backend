@@ -1,5 +1,5 @@
 .ONESHELL:
-.PHONY: statik all
+.PHONY: statik
 
 all_win:
 	$(MAKE) statik_win
@@ -11,7 +11,7 @@ all_mac:
 
 statik_mac:
 	cd webapp && yarn && yarn build && cd ..
-	~/go/bin0/statik -src=./webapp/build
+	~/go/bin/statik -src=./webapp/build
 
 statik_win:
 	cd webapp && yarn && yarn build && cd ..
